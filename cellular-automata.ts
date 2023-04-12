@@ -4,8 +4,16 @@
 const CELL_0 = ' ';
 const CELL_1 = '█';
 
+function getRuleSet(ruleNum: number): number[] {
+  const binary = ruleNum.toString(2).padStart(8, '0');
+  return binary
+    .split('')
+    .map((bit) => parseInt(bit))
+    .reverse();
+}
+
 function renderRow(row: number[]) {
-  return row.map((cell) => (cell === 1 ? CELL_0 : CELL_1)).join('') + '\n';
+  return row.map((cell) => (cell === 1 ? CELL_1 : CELL_0)).join('');
 }
 
 function applyRule(
@@ -27,14 +35,16 @@ function nextGeneration(ruleSet: number[], current: number[]) {
   return next;
 }
 
-function initAutomata(size: number) {
+function initialRow(size: number) {
   const automata = new Array<number>(size).fill(0);
   automata[Math.floor(size / 2)] = 1;
   return automata;
 }
 
-function cellularAutomata(ruleSet: number[], size: number, time: number) {
-  let current = initAutomata(size);
+// imperative version
+function cellularAutomata(ruleNumber: number, size: number, time: number) {
+  const ruleSet = getRuleSet(ruleNumber);
+  let current = initialRow(size);
   let rendered = renderRow(current);
 
   // evolve the automata
@@ -46,10 +56,21 @@ function cellularAutomata(ruleSet: number[], size: number, time: number) {
   return rendered;
 }
 
-// example rule set, ideally we want to explore the space of all possible rules
-// https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-const rules = {
-  30: [0, 1, 1, 1, 1, 0, 0, 0],
-};
+// generator version
+function createCellularAutomata(ruleNumber: number, size: number) {
+  const ruleSet = getRuleSet(ruleNumber);
+  let current = initialRow(size);
+  return function* () {
+    yield renderRow(current);
+    // evolve the automata
+    while (true) {
+      current = nextGeneration(ruleSet, current);
+      yield renderRow(current);
+    }
+  };
+}
 
-console.log(cellularAutomata(rules[30], 100, 100));
+const generator = createCellularAutomata(30, 30)();
+setInterval(() => {
+  console.log({ ['']: generator.next().value });
+}, 50);

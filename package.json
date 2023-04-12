@@ -1,0 +1,9 @@
+{
+  "name": "wolfram-ca",
+  "version": "0.0.1",
+  "description": "A Wolfram CA implementation in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node cellular-automata.ts"
+  }
+}

@@ -70,7 +70,7 @@ function createCellularAutomata(ruleNumber: number, size: number) {
   };
 }
 
-const generator = createCellularAutomata(30, 30)();
+const generator = createCellularAutomata(110, 30)();
 setInterval(() => {
   console.log({ ['']: generator.next().value });
 }, 50);
